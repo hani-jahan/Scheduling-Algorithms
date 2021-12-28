@@ -7,9 +7,22 @@ class Process:
     def __init__(self, label, execTime, startTime):
         self.label = label
         self.execTime = int(execTime)
+        self.remainingTime = self.execTime
         self.startTime = int(startTime)
+        self.endTime = -1
         self.runningTime = 0
 
+    def copy(self):
+        return Process(self.label, self.execTime, self.startTime)
+
+    def run(self):
+        self.remainingTime -= 1
+    
+    def isFinished(self):
+        return self.remainingTime == 0
+    
+    def turnAroundTime(self):
+        return self.endTime - self.startTime
 
 def loadFile(fileName):
     with open(fileName, 'r') as file:
@@ -36,15 +49,17 @@ def loadFile(fileName):
 def srtf():
     running = None
     global processes
-    processesCopy = processes.copy()
+    processesCopy = list(map(lambda x: x.copy(), processes))
     readyQueue = []
-    i = 0
+    time = 0
+    sumTT = 0
+    sumWT = 0
     while len(processesCopy) != 0 or len(readyQueue) != 0:
         for process in processesCopy:
-            if process.startTime == i:
+            if process.startTime == time:
                 readyQueue.append(process)
                 processesCopy.remove(process)
-            elif process.startTime > i:
+            elif process.startTime > time:
                 break
         srt = None
         for process in readyQueue:
@@ -60,10 +75,17 @@ def srtf():
         elif srt:
             running = srt
             running.runningTime += 1
-        if srt: 
-            srt.execTime -= 1
-        i += 1
-        if srt and srt.execTime == 0: readyQueue.remove(srt)
-    print(f'{running.label}({running.runningTime})', end='')
+        if running:
+            running.run()
+        time += 1
+        if running and running.isFinished():
+            running.endTime = time
+            readyQueue.remove(running)
+            sumTT += running.turnAroundTime()
+    print(f'{running.label}({running.runningTime})')
+    sumTT += running.turnAroundTime()
+    avgTT = sumTT / len(processes)
+    print(f'Average Turnaround Time: {avgTT}')
+
 loadFile('test.txt')
 srtf()
