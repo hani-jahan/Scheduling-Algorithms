@@ -23,6 +23,9 @@ class Process:
     
     def turnAroundTime(self):
         return self.endTime - self.startTime
+    
+    def waitingTime(self):
+        return self.turnAroundTime() - self.execTime
 
 def loadFile(fileName):
     with open(fileName, 'r') as file:
@@ -82,10 +85,14 @@ def srtf():
             running.endTime = time
             readyQueue.remove(running)
             sumTT += running.turnAroundTime()
+            sumWT += running.waitingTime()
     print(f'{running.label}({running.runningTime})')
     sumTT += running.turnAroundTime()
+    sumWT += running.waitingTime()
     avgTT = sumTT / len(processes)
-    print(f'Average Turnaround Time: {avgTT}')
+    avgWT = sumWT / len(processes)
+    print(f'Average Turnaround Time:\t{avgTT}')
+    print(f'Average   Waiting  Time:\t{avgWT}')
 
 loadFile('test.txt')
 srtf()
