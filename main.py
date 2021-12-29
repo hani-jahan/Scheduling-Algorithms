@@ -62,12 +62,16 @@ def loadFile(fileName):
         # sorts all processes by shortest start time
         processes.sort(key=lambda process: process.startTime)
 
-#===========================================#
-#==     shortest remaining time first     ==#
-#===========================================#
-
 
 def srtf():
+    #=======================================#
+    #==   shortest remaining time first   ==#
+    #=======================================#
+    
+    print('=================================')
+    print('= shortest remaining time first =')
+    print('=================================')
+    print()
     running = None
     # 'runing' is the process that is running at the time
     global processes
@@ -99,62 +103,105 @@ def srtf():
                 break
         srt = None
         # srt is the process with shortest remaining time
+
         for process in readyQueue:
+            # if there is no srt, or the process has less
+            # execution time than srt: set the process as srt
             if not srt or srt.execTime > process.execTime:
                 srt = process
+
+        # if there is srt and it's also running, increase running time by 1
         if srt and srt is running:
             srt.runningTime += 1
+
+        # if srt and running are different, print the running process and replace them
         elif srt and running:
-            print(f'{running.label}({running.runningTime})', end='--')
+            print(f'{running.label}({running.runningTime})', end=' --> ')
             running.runningTime = 0
             running = srt
             running.runningTime += 1
+
+        # when nothing is running, set srt as running
         elif srt:
             running = srt
             running.runningTime += 1
+
+        # each time loop starts, decrease remaining time of running by 1
         if running:
             running.run()
+        # increase time by 1
         time += 1
+
+        # when running is finished,
+        # set the endTime to the time
+        # and remove it from ready queue
         if running and running.isFinished():
             running.endTime = time
             readyQueue.remove(running)
+            # calculate sum of turnaround time and sum of waiting time
             sumTT += running.turnAroundTime()
             sumWT += running.waitingTime()
+    # print the running process
     print(f'{running.label}({running.runningTime})')
+    # calculate sum of turnaround time and sum of waiting time
     sumTT += running.turnAroundTime()
     sumWT += running.waitingTime()
+    # calculate average of turnaround time and average of waiting time
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
-    print(f'Average Turnaround Time:\t{avgTT}')
-    print(f'Average   Waiting  Time:\t{avgWT}')
-
-#===========================================#
-#==      Highest Response Ratio Next      ==#
-#===========================================#
+    # print averages
+    print(" ____________________________________________________")
+    print("|                                                    |")
+    print(f'|   Average Turnaround Time:\t{avgTT}   |')
+    print(f'|   Average   Waiting  Time:\t{avgWT}   |')
+    print("|____________________________________________________|")
+    print()
 
 
 def hrrn():
-    pass
+    #=======================================#
+    #==    Highest Response Ratio Next    ==#
+    #=======================================#
 
-#===========================================#
-#==              Round Robin              ==#
-#===========================================#
+    print('=================================')
+    print('=  Highest Response Ratio Next  =')
+    print('=================================')
+    print()
+    # response ratio = 1 + w/s
+    # where w is total waiting time until the time
+    # and s is service time of process (execTime)
+    pass
 
 
 def rr():
-    pass
+    #=======================================#
+    #==            Round Robin            ==#
+    #=======================================#
 
-#===========================================#
-#==       Multilevel Feedback Queue       ==#
-#==                                       ==#
-#==   Queue1 & Queue2: RR, Queue3: FCFS   ==#
-#===========================================#
+    print('=================================')
+    print('=          Round Robin          =')
+    print('=================================')
+    print()
+    pass
 
 
 def mfq():
+    #=======================================#
+    #==     Multilevel Feedback Queue     ==#
+    #==                                   ==#
+    #== Queue1 & Queue2: RR, Queue3: FCFS ==#
+    #=======================================#
+
+    print('=================================')
+    print('=   Multilevel Feedback Queue   =')
+    print('=================================')
+    print()
     pass
 
 
 #===========================================#
 loadFile('test.txt')
 srtf()
+hrrn()
+rr()
+mfq()
