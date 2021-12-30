@@ -112,7 +112,7 @@ def srtf():
         for process in readyQueue:
             # if there is no srt, or the process has less
             # burst time than srt: set the process as srt
-            if not srt or srt.burstTime > process.burstTime:
+            if not srt or srt.remainingTime > process.remainingTime:
                 srt = process
 
         # if there is srt and it's also running, increase turnaround time by 1
@@ -203,27 +203,30 @@ def hrrn():
         hrr = None
         for process in readyQueue:
             process.responseRatio = 1 + (
-                (process.burstTime + (time - process.arivalTime)) / process.burstTime)
+                (time - process.arivalTime + process.remainingTime) / process.burstTime)
+            # process.responseRatio = 1 + (
+            #     (process.burstTime + (time - process.arivalTime)) / process.burstTime)
             if not hrr or hrr.responseRatio < process.responseRatio:
                 hrr = process
-        if hrr and hrr is running:
-            hrr.turnaroundTime += 1
-        elif hrr and running:
-            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-            running.turnaroundTime = 0
-            running = hrr
-            running.turnaroundTime += 1
+        # if hrr and hrr is running:
+        #     hrr.turnaroundTime += 1
+        # elif hrr and running:
+        #     print(f'{running.label}({running.turnaroundTime})', end=' --> ')
+        #     running.turnaroundTime = 0
+        #     running = hrr
+        #     running.turnaroundTime += 1
 
-        elif hrr:
-            running = hrr
-            running.turnaroundTime += 1
+        # elif hrr:
+        #     running = hrr
+        #     running.turnaroundTime += 1
 
-        if running:
-            running.run()
+        # if running:
+        #     running.run()
 
-        time += 1
-
-        if running and running.isFinished():
+            running = process
+            running.turnaroundTime += running.burstTime
+            running.remainingTime = 0
+            time += running.burstTime
             running.exitTime = time
             readyQueue.remove(running)
             sumTT += running.turnAroundTime()
