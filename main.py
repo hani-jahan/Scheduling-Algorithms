@@ -274,5 +274,3 @@ def mfq():
 loadFile('test.txt')
 srtf()
 hrrn()
-rr()
-mfq()
