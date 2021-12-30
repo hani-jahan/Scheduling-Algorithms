@@ -238,11 +238,11 @@ def hrrn():
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
     # print averages
-    print(" ____________________________________________________")
-    print("|                                                    |")
-    print(f'|   Average Turnaround Time:\t{avgTT}   |')
-    print(f'|   Average   Waiting  Time:\t{avgWT}   |')
-    print("|____________________________________________________|")
+    print(" _______________________________________")
+    print("|                                       |")
+    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
+    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
+    print("|_______________________________________|")
     print()
 
 
