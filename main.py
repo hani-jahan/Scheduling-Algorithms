@@ -192,7 +192,7 @@ def hrrn():
 
     while len(processesCopy) != 0 or len(readyQueue) != 0:
         for process in processesCopy:
-            if process.arivalTime == time:
+            if process.arivalTime <= time:
 
                 readyQueue.append(process)
                 processesCopy.remove(process)
@@ -202,35 +202,21 @@ def hrrn():
 
         hrr = None
         for process in readyQueue:
-            process.responseRatio = 1 + (
-                (time - process.arivalTime + process.remainingTime) / process.burstTime)
+            process.responseRatio = (
+                time - process.arivalTime + process.remainingTime) / process.burstTime
             # process.responseRatio = 1 + (
             #     (process.burstTime + (time - process.arivalTime)) / process.burstTime)
             if not hrr or hrr.responseRatio < process.responseRatio:
                 hrr = process
-        # if hrr and hrr is running:
-        #     hrr.turnaroundTime += 1
-        # elif hrr and running:
-        #     print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-        #     running.turnaroundTime = 0
-        #     running = hrr
-        #     running.turnaroundTime += 1
 
-        # elif hrr:
-        #     running = hrr
-        #     running.turnaroundTime += 1
-
-        # if running:
-        #     running.run()
-
-            running = process
-            running.turnaroundTime += running.burstTime
-            running.remainingTime = 0
-            time += running.burstTime
-            running.exitTime = time
-            readyQueue.remove(running)
-            sumTT += running.turnAroundTime()
-            sumWT += running.waitingTime()
+        running = hrr
+        running.turnaroundTime += running.burstTime
+        running.remainingTime = 0
+        time += running.burstTime
+        running.exitTime = time
+        readyQueue.remove(running)
+        sumTT += running.turnAroundTime()
+        sumWT += running.waitingTime()
 
     print(f'{running.label}({running.turnaroundTime})')
 
