@@ -67,7 +67,7 @@ def srtf():
     #=======================================#
     #==   shortest remaining time first   ==#
     #=======================================#
-    
+
     print('=================================')
     print('= shortest remaining time first =')
     print('=================================')
@@ -170,7 +170,32 @@ def hrrn():
     # response ratio = 1 + w/s
     # where w is total waiting time until the time
     # and s is service time of process (execTime)
-    pass
+
+    running = None
+    # 'runing' is the process that is running at the time
+    global processes
+    # create a copy of all processes
+    processesCopy = list(map(lambda x: x.copy(), processes))
+    # set an empty ready queue
+    readyQueue = []
+    # set time
+    time = 0
+    # set sum of turnaround time
+    sumTT = 0
+    # set sum of waiting time
+    sumWT = 0
+    #########################################################
+    #########################################################
+    # calculate average of turnaround time and average of waiting time
+    avgTT = sumTT / len(processes)
+    avgWT = sumWT / len(processes)
+    # print averages
+    print(" ____________________________________________________")
+    print("|                                                    |")
+    print(f'|   Average Turnaround Time:\t{avgTT}   |')
+    print(f'|   Average   Waiting  Time:\t{avgWT}   |')
+    print("|____________________________________________________|")
+    print()
 
 
 def rr():
@@ -182,7 +207,6 @@ def rr():
     print('=          Round Robin          =')
     print('=================================')
     print()
-    pass
 
 
 def mfq():
@@ -196,7 +220,6 @@ def mfq():
     print('=   Multilevel Feedback Queue   =')
     print('=================================')
     print()
-    pass
 
 
 #===========================================#
