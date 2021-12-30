@@ -99,13 +99,15 @@ def srtf():
             if process.arivalTime == time:
                 # adds the process to ready queue,
                 readyQueue.append(process)
-                # and removes it from the processes list.
-                processesCopy.remove(process)
-
             # when reaches the first arival time that
             #  we haven't reached yet, gets out of for loop
             elif process.arivalTime > time:
                 break
+            for process in readyQueue:
+                # and removes it from the processes list.
+                if process in processesCopy:
+                    processesCopy.remove(process)
+
         srt = None
         # srt is the process with shortest remaining time
 
@@ -193,12 +195,12 @@ def hrrn():
     while len(processesCopy) != 0 or len(readyQueue) != 0:
         for process in processesCopy:
             if process.arivalTime <= time:
-
                 readyQueue.append(process)
-                processesCopy.remove(process)
-
             elif process.arivalTime > time:
                 break
+            for process in readyQueue:
+                if process in processesCopy:
+                    processesCopy.remove(process)
 
         hrr = None
         for process in readyQueue:
@@ -214,19 +216,16 @@ def hrrn():
         running.remainingTime = 0
         time += running.burstTime
         running.exitTime = time
+        print(f'{running.label}({running.turnaroundTime})', end=' --> ')
         readyQueue.remove(running)
         sumTT += running.turnAroundTime()
         sumWT += running.waitingTime()
-
-    print(f'{running.label}({running.turnaroundTime})')
-
-    sumTT += running.turnAroundTime()
-    sumWT += running.waitingTime()
 
     # calculate average of turnaround time and average of waiting time
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
     # print averages
+    print()
     print(" _______________________________________")
     print("|                                       |")
     print(f'|   Average Turnaround Time:\t{avgTT}\t|')
