@@ -75,9 +75,11 @@ def srtf():
     #==   shortest remaining time first   ==#
     #=======================================#
 
-    print('=================================')
-    print('= shortest remaining time first =')
-    print('=================================')
+    print('||=====================================================||')
+    print('||                                                     ||')
+    print('||            shortest remaining time first            ||')
+    print('||                                                     ||')
+    print('||=====================================================||')
     print()
     running = None
     # 'runing' is the process that is running at the time
@@ -156,11 +158,12 @@ def srtf():
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
     # print averages
-    print(" _______________________________________")
-    print("|                                       |")
-    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
-    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
-    print("|_______________________________________|")
+    print(" ______________________________________________________")
+    print()
+    print(f'\t Average Turnaround Time:\t{avgTT}\t')
+    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+    print(" ______________________________________________________")
+    print()
     print()
 
 
@@ -169,9 +172,11 @@ def hrrn():
     #==    Highest Response Ratio Next    ==#
     #=======================================#
 
-    print('=================================')
-    print('=  Highest Response Ratio Next  =')
-    print('=================================')
+    print('||=====================================================||')
+    print('||                                                     ||')
+    print('||             Highest Response Ratio Next             ||')
+    print('||                                                     ||')
+    print('||=====================================================||')
     print()
 
     running = None
@@ -218,11 +223,12 @@ def hrrn():
     avgWT = sumWT / len(processes)
     # print averages
     print()
-    print(" _______________________________________")
-    print("|                                       |")
-    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
-    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
-    print("|_______________________________________|")
+    print(" ______________________________________________________")
+    print()
+    print(f'\t Average Turnaround Time:\t{avgTT}\t')
+    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+    print(" ______________________________________________________")
+    print()
     print()
 
 
@@ -231,9 +237,11 @@ def rr():
     #==            Round Robin            ==#
     #=======================================#
 
-    print('=================================')
-    print('=          Round Robin          =')
-    print('=================================')
+    print('||=====================================================||')
+    print('||                                                     ||')
+    print('||                     Round Robin                     ||')
+    print('||                                                     ||')
+    print('||=====================================================||')
     print()
 
     running = None
@@ -289,11 +297,12 @@ def rr():
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
     # print averages
-    print(" _______________________________________")
-    print("|                                       |")
-    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
-    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
-    print("|_______________________________________|")
+    print(" ______________________________________________________")
+    print()
+    print(f'\t Average Turnaround Time:\t{avgTT}\t')
+    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+    print(" ______________________________________________________")
+    print()
     print()
 
 
@@ -304,9 +313,11 @@ def mfq():
     #== Queue1 & Queue2: RR, Queue3: FCFS ==#
     #=======================================#
 
-    print('=================================')
-    print('=   Multilevel Feedback Queue   =')
-    print('=================================')
+    print('||=====================================================||')
+    print('||                                                     ||')
+    print('||              Multilevel Feedback Queue              ||')
+    print('||                                                     ||')
+    print('||=====================================================||')
     print()
 
     running = None
@@ -395,11 +406,13 @@ def mfq():
     avgWT = sumWT / len(processes)
     # print averages
     print()
-    print(" _______________________________________")
-    print("|                                       |")
-    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
-    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
-    print("|_______________________________________|")
+    print(" ______________________________________________________")
+    print()
+    print(f'\t Average Turnaround Time:\t{avgTT}\t')
+    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+    print("_______________________________________________________")
+    print()
+    print()
 
 
 #===========================================#
