@@ -31,7 +31,6 @@ class Process:
     def turnAroundTime(self):
         return self.exitTime - self.arrivalTime
 
-
     def responseRatio(self, time):
         return (time - self.arrivalTime + self.remainingTime) / self.burstTime
 
@@ -309,9 +308,82 @@ def mfq():
     # set time
     time = 0
 
+    while len(processesCopy) != 0 or len(queue1) != 0:
+        for process in processesCopy:
+            if process.arrivalTime <= time:
+                queue1.append(process)
+            elif process.arrivalTime > time:
+                break
+        if running and not running.isFinished():
+            queue2.append(running)
+        for process in queue1:
+            if process in processesCopy:
+                processesCopy.remove(process)
+        
+        if len(queue1) != 0:
+            running = queue1.pop(0)
+        else: break
+
+        if running.remainingTime <= q1:
+            time += running.remainingTime
+            running.remainingTime = 0
+            running.exitTime = time
+            running.execTime += running.remainingTime
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
+
+        elif running.remainingTime > q1:
+            running.remainingTime -= q1
+            running.execTime += q1
+            time += q1
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
+
+    running = None
+    while len(queue2) != 0:
+        for process in processesCopy:
+            if process.arrivalTime <= time:
+                queue2.append(process)
+            elif process.arrivalTime > time:
+                break
+        if running and not running.isFinished():
+            queue3.append(running)
+        for process in queue2:
+            if process in processesCopy:
+                processesCopy.remove(process)
+
+        running = queue2.pop(0)
+
+        if running.remainingTime <= q2:
+            time += running.remainingTime
+            running.remainingTime = 0
+            running.exitTime = time
+            running.execTime += running.remainingTime
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
+
+        elif running.remainingTime > q2:
+            running.remainingTime -= q2
+            running.execTime += q2
+            time += q2
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
+
+    running = None
+    while len(queue3) != 0:
+        for process in queue3:
+            running = process
+            running.execTime += running.remainingTime
+            print(f'{running.label}({time})', end=' --> ')
+            running.exitTime = time
+            time += running.remainingTime
+            running.remainingTime = 0
+            queue3.remove(running)
+
 
 #===========================================#
 loadFile('test.txt')
 # srtf()
 # hrrn()
-rr()
+# rr()
+mfq()
