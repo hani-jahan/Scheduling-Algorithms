@@ -4,18 +4,21 @@ processes = []  # All processes
 
 
 class Process:
-    def __init__(self, label, burstTime, arivalTime):
+    def __init__(self, label, burstTime, arrivalTime):
         self.label = label
         self.burstTime = int(burstTime)
-        self.arivalTime = int(arivalTime)
+        self.arrivalTime = int(arrivalTime)
         self.turnaroundTime = 0
         self.exitTime = -1
         self.remainingTime = self.burstTime
         self.responceRatio = 0
 
+    def __str__(self):
+        return (f'label:{self.label}\t Burst:{self.burstTime}\t Arrival:{self.arrivalTime}\t TT:{self.turnaroundTime}\t exit:{self.exitTime}\t remaining:{self.remainingTime}\t Responce Ratio:{self.responceRatio}')
+
     # copies a process
     def copy(self):
-        return Process(self.label, self.burstTime, self.arivalTime)
+        return Process(self.label, self.burstTime, self.arrivalTime)
 
     # runs process for 1 time (decreases remaining time by 1)
     def run(self):
@@ -27,7 +30,7 @@ class Process:
 
     # calculates turnaround time
     def turnAroundTime(self):
-        return self.exitTime - self.arivalTime
+        return self.exitTime - self.arrivalTime
 
     # calculates turnaround time by waiting time
     def turnAroundTime_byWT(self):
@@ -49,9 +52,9 @@ def loadFile(fileName):
         burstTimes = file.readline().split(',')
         burstTimes = list(map(lambda x: x.strip(), burstTimes))
 
-        # creates a list containing arival time of each process
-        arivalTimes = file.readline().split(',')
-        arivalTimes = list(map(lambda x: x.strip(), arivalTimes))
+        # creates a list containing arrival time of each process
+        arrivalTimes = file.readline().split(',')
+        arrivalTimes = list(map(lambda x: x.strip(), arrivalTimes))
 
         # sets Quantum 1
         global q1
@@ -63,9 +66,9 @@ def loadFile(fileName):
         global processes
         # creates a list of tupples containig all data of a process
         processes = list(map(lambda x: Process(
-            x[0], x[1], x[2]), zip(labels, burstTimes, arivalTimes)))
-        # sorts all processes by arival time
-        processes.sort(key=lambda process: process.arivalTime)
+            x[0], x[1], x[2]), zip(labels, burstTimes, arrivalTimes)))
+        # sorts all processes by arrival time
+        processes.sort(key=lambda process: process.arrivalTime)
 
 
 def srtf():
@@ -95,13 +98,13 @@ def srtf():
     while len(processesCopy) != 0 or len(readyQueue) != 0:
         # for all the processes:
         for process in processesCopy:
-            # if the arival time of a process equals to the time we're on,
-            if process.arivalTime == time:
+            # if the arrival time of a process equals to the time we're on,
+            if process.arrivalTime == time:
                 # adds the process to ready queue,
                 readyQueue.append(process)
-            # when reaches the first arival time that
+            # when reaches the first arrival time that
             #  we haven't reached yet, gets out of for loop
-            elif process.arivalTime > time:
+            elif process.arrivalTime > time:
                 break
             for process in readyQueue:
                 # and removes it from the processes list.
@@ -174,9 +177,6 @@ def hrrn():
     print('=  Highest Response Ratio Next  =')
     print('=================================')
     print()
-    # response ratio = 1 + w/s
-    # where w is total waiting time until the time
-    # and s is service time of process (burstTime)
 
     running = None
     # 'runing' is the process that is running at the time
@@ -194,9 +194,9 @@ def hrrn():
 
     while len(processesCopy) != 0 or len(readyQueue) != 0:
         for process in processesCopy:
-            if process.arivalTime <= time:
+            if process.arrivalTime <= time:
                 readyQueue.append(process)
-            elif process.arivalTime > time:
+            elif process.arrivalTime > time:
                 break
             for process in readyQueue:
                 if process in processesCopy:
@@ -205,21 +205,19 @@ def hrrn():
         hrr = None
         for process in readyQueue:
             process.responseRatio = (
-                time - process.arivalTime + process.remainingTime) / process.burstTime
-            # process.responseRatio = 1 + (
-            #     (process.burstTime + (time - process.arivalTime)) / process.burstTime)
+                time - process.arrivalTime + process.remainingTime) / process.burstTime
+
             if not hrr or hrr.responseRatio < process.responseRatio:
                 hrr = process
 
-        running = hrr
-        running.turnaroundTime += running.burstTime
-        running.remainingTime = 0
-        time += running.burstTime
-        running.exitTime = time
-        print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-        readyQueue.remove(running)
-        sumTT += running.turnAroundTime()
-        sumWT += running.waitingTime()
+        hrr.turnaroundTime += hrr.burstTime
+        hrr.remainingTime = 0
+        time += hrr.burstTime
+        hrr.exitTime = time
+        print(f'{hrr.label}({hrr.turnaroundTime})', end=' --> ')
+        readyQueue.remove(hrr)
+        sumTT += hrr.turnAroundTime()
+        sumWT += hrr.waitingTime()
 
     # calculate average of turnaround time and average of waiting time
     avgTT = sumTT / len(processes)
@@ -244,6 +242,48 @@ def rr():
     print('=================================')
     print()
 
+    running = None
+    global q1
+    global processes
+    # create a copy of all processes
+    processesCopy = list(map(lambda x: x.copy(), processes))
+    # set an empty ready queue
+    readyQueue = []
+    # set time
+    time = 0
+
+    while len(processesCopy) != 0 or len(readyQueue) != 0:
+        # for all the processes:
+        for process in processesCopy:
+            if process.arrivalTime <= time:
+                readyQueue.append(process)
+            elif process.arrivalTime > time:
+                break
+        if running and not running.isFinished():
+            readyQueue.append(running)
+        for process in readyQueue:
+            if process in processesCopy:
+                processesCopy.remove(process)
+
+        if len(readyQueue) != 0:
+            running = readyQueue.pop(0)
+        else: None
+
+        if running.remainingTime <= q1:
+            running.turnaroundTime += running.remainingTime
+            running.remainingTime = 0
+            running.exitTime = time
+            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
+            running.turnaroundTime = 0
+            time += running.remainingTime
+
+        elif running.remainingTime > q1:
+            running.remainingTime -= q1
+            running.turnaroundTime += q1
+            time += q1
+            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
+            running.turnaroundTime = 0
+
 
 def mfq():
     #=======================================#
@@ -260,5 +300,4 @@ def mfq():
 
 #===========================================#
 loadFile('test.txt')
-srtf()
-hrrn()
+rr()
