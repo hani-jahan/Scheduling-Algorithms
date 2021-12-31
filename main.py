@@ -31,16 +31,13 @@ class Process:
     def turnAroundTime(self):
         return self.exitTime - self.arrivalTime
 
-    def responseRatio(self, time):
-        return (time - self.arrivalTime + self.remainingTime) / self.burstTime
-
-    # calculates turnaround time by waiting time
-    def turnAroundTime_byWT(self):
-        return self.burstTime + self.waitingTime()
-
     # calculates waiting time
     def waitingTime(self):
         return self.turnAroundTime() - self.burstTime
+
+    # calculate response ratio at time
+    def responseRatio(self, time):
+        return (time - self.arrivalTime + self.remainingTime) / self.burstTime
 
 
 def loadFile(fileName):
@@ -285,7 +282,21 @@ def rr():
             time += q1
             print(f'{running.label}({time})', end=' --> ')
             running.execTime = 0
-    
+
+        # calculate sum of turnaround time and sum of waiting time
+        if running.isFinished():
+            sumTT += running.turnAroundTime()
+            sumWT += running.waitingTime()
+    print()
+    # calculate average of turnaround time and average of waiting time
+    avgTT = sumTT / len(processes)
+    avgWT = sumWT / len(processes)
+    # print averages
+    print(" _______________________________________")
+    print("|                                       |")
+    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
+    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
+    print("|_______________________________________|")
     print()
 
 
@@ -313,6 +324,10 @@ def mfq():
     queue3 = []
     # set time
     time = 0
+    # set sum of turnaround time
+    sumTT = 0
+    # set sum of waiting time
+    sumWT = 0
 
     while len(processesCopy) != 0 or len(queue1) != 0 or len(queue2) != 0 or len(queue3) != 0:
         for process in processesCopy:
@@ -372,6 +387,22 @@ def mfq():
             time += running.remainingTime
             running.exitTime = time
             running.remainingTime = 0
+
+    # calculate sum of turnaround time and sum of waiting time
+        if running.isFinished():
+            sumTT += running.turnAroundTime()
+            sumWT += running.waitingTime()
+    print()
+    # calculate average of turnaround time and average of waiting time
+    avgTT = sumTT / len(processes)
+    avgWT = sumWT / len(processes)
+    # print averages
+    print()
+    print(" _______________________________________")
+    print("|                                       |")
+    print(f'|   Average Turnaround Time:\t{avgTT}\t|')
+    print(f'|   Average   Waiting  Time:\t{avgWT}\t|')
+    print("|_______________________________________|")
 
 
 #===========================================#
