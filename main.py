@@ -251,6 +251,10 @@ def rr():
     readyQueue = []
     # set time
     time = 0
+    # set sum of turnaround time
+    sumTT = 0
+    # set sum of waiting time
+    sumWT = 0
 
     while len(processesCopy) != 0 or len(readyQueue) != 0 or (running and not running.isFinished()):
         # for all the processes:
@@ -281,6 +285,8 @@ def rr():
             time += q1
             print(f'{running.label}({time})', end=' --> ')
             running.execTime = 0
+    
+    print()
 
 
 def mfq():
@@ -360,14 +366,12 @@ def mfq():
                 queue3.append(running)
 
         elif len(queue3) != 0:
-            for process in queue3:
-                running = process
-                running.execTime += running.remainingTime
-                print(f'{running.label}({time})', end=' --> ')
-                running.exitTime = time
-                time += running.remainingTime
-                running.remainingTime = 0
-                queue3.remove(running)
+            running = queue3.pop(0)
+            running.execTime += running.remainingTime
+            print(f'{running.label}({time})', end=' --> ')
+            time += running.remainingTime
+            running.exitTime = time
+            running.remainingTime = 0
 
 
 #===========================================#
