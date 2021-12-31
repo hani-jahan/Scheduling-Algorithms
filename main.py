@@ -265,17 +265,15 @@ def rr():
             if process in processesCopy:
                 processesCopy.remove(process)
 
-        if len(readyQueue) != 0:
             running = readyQueue.pop(0)
-        else: None
 
         if running.remainingTime <= q1:
-            running.turnaroundTime += running.remainingTime
+            time += running.remainingTime
             running.remainingTime = 0
             running.exitTime = time
+            running.turnaroundTime += running.remainingTime
             print(f'{running.label}({running.turnaroundTime})', end=' --> ')
             running.turnaroundTime = 0
-            time += running.remainingTime
 
         elif running.remainingTime > q1:
             running.remainingTime -= q1
