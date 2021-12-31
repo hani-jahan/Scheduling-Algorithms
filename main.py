@@ -317,7 +317,7 @@ def mfq():
         for process in queue1:
             if process in processesCopy:
                 processesCopy.remove(process)
-        
+
         if len(queue1) != 0:
             running = queue1.pop(0)
             if running.remainingTime <= q1:
@@ -334,10 +334,10 @@ def mfq():
                 time += q1
                 print(f'{running.label}({time})', end=' --> ')
                 running.execTime = 0
-            
+
             if running and not running.isFinished():
                 queue2.append(running)
-        
+
         elif len(queue2) != 0:
             running = queue2.pop(0)
 
@@ -355,7 +355,7 @@ def mfq():
                 time += q2
                 print(f'{running.label}({time})', end=' --> ')
                 running.execTime = 0
-            
+
             if running and not running.isFinished():
                 queue3.append(running)
 
@@ -372,7 +372,7 @@ def mfq():
 
 #===========================================#
 loadFile('test.txt')
-# srtf()
-# hrrn()
-# rr()
+srtf()
+hrrn()
+rr()
 mfq()
