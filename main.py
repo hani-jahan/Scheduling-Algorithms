@@ -152,9 +152,6 @@ def srtf():
             sumWT += running.waitingTime()
     # print the running process
     print(f'{running.label}({time})')
-    # calculate sum of turnaround time and sum of waiting time
-    sumTT += running.turnAroundTime()
-    sumWT += running.waitingTime()
     # calculate average of turnaround time and average of waiting time
     avgTT = sumTT / len(processes)
     avgWT = sumWT / len(processes)
