@@ -8,13 +8,12 @@ class Process:
         self.label = label
         self.burstTime = int(burstTime)
         self.arrivalTime = int(arrivalTime)
-        self.turnaroundTime = 0
+        self.execTime = 0
         self.exitTime = -1
         self.remainingTime = self.burstTime
-        self.responceRatio = 0
 
     def __str__(self):
-        return (f'label:{self.label}\t Burst:{self.burstTime}\t Arrival:{self.arrivalTime}\t TT:{self.turnaroundTime}\t exit:{self.exitTime}\t remaining:{self.remainingTime}\t Responce Ratio:{self.responceRatio}')
+        return (f'label:{self.label}\t Burst:{self.burstTime}\t Arrival:{self.arrivalTime}\t TT:{self.execTime}\t exit:{self.exitTime}\t remaining:{self.remainingTime}\t Responce Ratio:{self.responseRatio()}')
 
     # copies a process
     def copy(self):
@@ -31,6 +30,10 @@ class Process:
     # calculates turnaround time
     def turnAroundTime(self):
         return self.exitTime - self.arrivalTime
+
+
+    def responseRatio(self, time):
+        return (time - self.arrivalTime + self.remainingTime) / self.burstTime
 
     # calculates turnaround time by waiting time
     def turnAroundTime_byWT(self):
@@ -122,19 +125,19 @@ def srtf():
 
         # if there is srt and it's also running, increase turnaround time by 1
         if srt and srt is running:
-            srt.turnaroundTime += 1
+            srt.execTime += 1
 
         # if srt and running are different, print the running process and replace them
         elif srt and running:
-            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-            running.turnaroundTime = 0
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
             running = srt
-            running.turnaroundTime += 1
+            running.execTime += 1
 
         # when nothing is running, set srt as running
         elif srt:
             running = srt
-            running.turnaroundTime += 1
+            running.execTime += 1
 
         # each time loop starts, decrease remaining time of running by 1
         if running:
@@ -152,7 +155,7 @@ def srtf():
             sumTT += running.turnAroundTime()
             sumWT += running.waitingTime()
     # print the running process
-    print(f'{running.label}({running.turnaroundTime})')
+    print(f'{running.label}({time})')
     # calculate sum of turnaround time and sum of waiting time
     sumTT += running.turnAroundTime()
     sumWT += running.waitingTime()
@@ -204,17 +207,15 @@ def hrrn():
 
         hrr = None
         for process in readyQueue:
-            process.responseRatio = (
-                time - process.arrivalTime + process.remainingTime) / process.burstTime
 
-            if not hrr or hrr.responseRatio < process.responseRatio:
+            if not hrr or hrr.responseRatio(time) < process.responseRatio(time):
                 hrr = process
 
-        hrr.turnaroundTime += hrr.burstTime
+        hrr.execTime += hrr.burstTime
         hrr.remainingTime = 0
         time += hrr.burstTime
         hrr.exitTime = time
-        print(f'{hrr.label}({hrr.turnaroundTime})', end=' --> ')
+        print(f'{hrr.label}({time})', end=' --> ')
         readyQueue.remove(hrr)
         sumTT += hrr.turnAroundTime()
         sumWT += hrr.waitingTime()
@@ -252,7 +253,7 @@ def rr():
     # set time
     time = 0
 
-    while len(processesCopy) != 0 or len(readyQueue) != 0:
+    while len(processesCopy) != 0 or len(readyQueue) != 0 or (running and not running.isFinished()):
         # for all the processes:
         for process in processesCopy:
             if process.arrivalTime <= time:
@@ -265,22 +266,22 @@ def rr():
             if process in processesCopy:
                 processesCopy.remove(process)
 
-            running = readyQueue.pop(0)
+        running = readyQueue.pop(0)
 
         if running.remainingTime <= q1:
             time += running.remainingTime
             running.remainingTime = 0
             running.exitTime = time
-            running.turnaroundTime += running.remainingTime
-            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-            running.turnaroundTime = 0
+            running.execTime += running.remainingTime
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
 
         elif running.remainingTime > q1:
             running.remainingTime -= q1
-            running.turnaroundTime += q1
+            running.execTime += q1
             time += q1
-            print(f'{running.label}({running.turnaroundTime})', end=' --> ')
-            running.turnaroundTime = 0
+            print(f'{running.label}({time})', end=' --> ')
+            running.execTime = 0
 
 
 def mfq():
@@ -295,7 +296,22 @@ def mfq():
     print('=================================')
     print()
 
+    running = None
+    global q1
+    global q2
+    global processes
+    # create a copy of all processes
+    processesCopy = list(map(lambda x: x.copy(), processes))
+    # set empty ready queueس
+    queue1 = []
+    queue2 = []
+    queue3 = []
+    # set time
+    time = 0
+
 
 #===========================================#
 loadFile('test.txt')
+# srtf()
+# hrrn()
 rr()
