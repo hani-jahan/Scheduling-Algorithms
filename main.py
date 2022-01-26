@@ -1,418 +1,424 @@
 q1 = 0  # First Quantum
-q2 = 0  # Second Quantom
+q2 = 0  # Second Quantum
 processes = []  # All processes
 
 
 class Process:
-    def __init__(self, label, burstTime, arrivalTime):
-        self.label = label
-        self.burstTime = int(burstTime)
-        self.arrivalTime = int(arrivalTime)
-        self.execTime = 0
-        self.exitTime = -1
-        self.remainingTime = self.burstTime
 
-    def __str__(self):
-        return (f'label:{self.label}\t Burst:{self.burstTime}\t Arrival:{self.arrivalTime}\t TT:{self.execTime}\t exit:{self.exitTime}\t remaining:{self.remainingTime}\t Responce Ratio:{self.responseRatio()}')
+  def __init__(self, label, burstTime, arrivalTime):
+    self.label = label
+    self.burstTime = int(burstTime)
+    self.arrivalTime = int(arrivalTime)
+    self.execTime = 0
+    self.exitTime = -1
+    self.remainingTime = self.burstTime
 
-    # copies a process
-    def copy(self):
-        return Process(self.label, self.burstTime, self.arrivalTime)
+  def __str__(self):
+    return (
+        f'label:{self.label}\t Burst:{self.burstTime}\t Arrival:{self.arrivalTime}\t TT:{self.execTime}\t exit:{self.exitTime}\t remaining:{self.remainingTime}\t Responce Ratio:{self.responseRatio()}'
+    )
 
-    # runs process for 1 time (decreases remaining time by 1)
-    def run(self):
-        self.remainingTime -= 1
+  # copies a process
+  def copy(self):
+    return Process(self.label, self.burstTime, self.arrivalTime)
 
-    # checkes if a process is finished runnig or not -returns T or F
-    def isFinished(self):
-        return self.remainingTime == 0
+  # runs process for 1 time (decreases remaining time by 1)
+  def run(self):
+    self.remainingTime -= 1
 
-    # calculates turnaround time
-    def turnAroundTime(self):
-        return self.exitTime - self.arrivalTime
+  # checkes if a process is finished runnig or not -returns T or F
+  def isFinished(self):
+    return self.remainingTime == 0
 
-    # calculates waiting time
-    def waitingTime(self):
-        return self.turnAroundTime() - self.burstTime
+  # calculates turnaround time
+  def turnAroundTime(self):
+    return self.exitTime - self.arrivalTime
 
-    # calculate response ratio at time
-    def responseRatio(self, time):
-        return (time - self.arrivalTime + self.remainingTime) / self.burstTime
+  # calculates waiting time
+  def waitingTime(self):
+    return self.turnAroundTime() - self.burstTime
+
+  # calculate response ratio at time
+  def responseRatio(self, time):
+    return (time - self.arrivalTime + self.remainingTime) / self.burstTime
 
 
 def loadFile(fileName):
-    # loads a file and reads the data
-    with open(fileName, 'r') as file:
-        processCount = int(file.readline())
-        # sets a label for every process
-        labels = list(map(lambda i: f'P{i}', range(processCount)))
+  # loads a file and reads the data
+  with open(fileName, 'r') as file:
+    processCount = int(file.readline())
+    # sets a label for every process
+    labels = list(map(lambda i: f'P{i}', range(processCount)))
 
-        # creates a list containing burst time of each process
-        burstTimes = file.readline().split(',')
-        burstTimes = list(map(lambda x: x.strip(), burstTimes))
+    # creates a list containing burst time of each process
+    burstTimes = file.readline().split(',')
+    burstTimes = list(map(lambda x: x.strip(), burstTimes))
 
-        # creates a list containing arrival time of each process
-        arrivalTimes = file.readline().split(',')
-        arrivalTimes = list(map(lambda x: x.strip(), arrivalTimes))
+    # creates a list containing arrival time of each process
+    arrivalTimes = file.readline().split(',')
+    arrivalTimes = list(map(lambda x: x.strip(), arrivalTimes))
 
-        # sets Quantum 1
-        global q1
-        q1 = int(file.readline())
-        # sets Quantum 2
-        global q2
-        q2 = int(file.readline())
+    # sets Quantum 1
+    global q1
+    q1 = int(file.readline())
+    # sets Quantum 2
+    global q2
+    q2 = int(file.readline())
 
-        global processes
-        # creates a list of tupples containig all data of a process
-        processes = list(map(lambda x: Process(
-            x[0], x[1], x[2]), zip(labels, burstTimes, arrivalTimes)))
-        # sorts all processes by arrival time
-        processes.sort(key=lambda process: process.arrivalTime)
+    global processes
+    # creates a list of tupples containig all data of a process
+    processes = list(
+        map(lambda x: Process(x[0], x[1], x[2]),
+            zip(labels, burstTimes, arrivalTimes)))
+    # sorts all processes by arrival time
+    processes.sort(key=lambda process: process.arrivalTime)
 
 
 def srtf():
-    #=======================================#
-    #==   shortest remaining time first   ==#
-    #=======================================#
+  #=======================================#
+  #==   shortest remaining time first   ==#
+  #=======================================#
 
-    print('||=====================================================||')
-    print('||                                                     ||')
-    print('||            shortest remaining time first            ||')
-    print('||                                                     ||')
-    print('||=====================================================||')
-    print()
-    running = None
-    # 'runing' is the process that is running at the time
-    global processes
-    # create a copy of all processes
-    processesCopy = list(map(lambda x: x.copy(), processes))
-    # set an empty ready queue
-    readyQueue = []
-    # set time
-    time = 0
-    # set sum of turnaround time
-    sumTT = 0
-    # set sum of waiting time
-    sumWT = 0
+  print('||=====================================================||')
+  print('||                                                     ||')
+  print('||            shortest remaining time first            ||')
+  print('||                                                     ||')
+  print('||=====================================================||')
+  print()
+  running = None
+  # 'runing' is the process that is running at the time
+  global processes
+  # create a copy of all processes
+  processesCopy = list(map(lambda x: x.copy(), processes))
+  # set an empty ready queue
+  readyQueue = []
+  # set time
+  time = 0
+  # set sum of turnaround time
+  sumTT = 0
+  # set sum of waiting time
+  sumWT = 0
 
-    # loop runs until processes list or ready queue are not empty
-    while len(processesCopy) != 0 or len(readyQueue) != 0:
-        # for all the processes:
-        for process in processesCopy:
-            # if the arrival time of a process equals to the time we're on,
-            if process.arrivalTime == time:
-                # adds the process to ready queue,
-                readyQueue.append(process)
-            # when reaches the first arrival time that
-            #  we haven't reached yet, gets out of for loop
-            elif process.arrivalTime > time:
-                break
-            for process in readyQueue:
-                # and removes it from the processes list.
-                if process in processesCopy:
-                    processesCopy.remove(process)
+  # loop runs until processes list or ready queue are not empty
+  while len(processesCopy) != 0 or len(readyQueue) != 0:
+    # for all the processes:
+    for process in processesCopy:
+      # if the arrival time of a process equals to the time we're on,
+      if process.arrivalTime == time:
+        # adds the process to ready queue,
+        readyQueue.append(process)
+      # when reaches the first arrival time that
+      #  we haven't reached yet, gets out of for loop
+      elif process.arrivalTime > time:
+        break
+      for process in readyQueue:
+        # and removes it from the processes list.
+        if process in processesCopy:
+          processesCopy.remove(process)
 
-        srt = None
-        # srt is the process with shortest remaining time
+    srt = None
+    # srt is the process with shortest remaining time
 
-        for process in readyQueue:
-            # if there is no srt, or the process has less
-            # burst time than srt: set the process as srt
-            if not srt or srt.remainingTime > process.remainingTime:
-                srt = process
+    for process in readyQueue:
+      # if there is no srt, or the process has less
+      # burst time than srt: set the process as srt
+      if not srt or srt.remainingTime > process.remainingTime:
+        srt = process
 
-        # if there is srt and it's also running, increase turnaround time by 1
-        if srt and srt is running:
-            srt.execTime += 1
+    # if there is srt and it's also running, increase turnaround time by 1
+    if srt and srt is running:
+      srt.execTime += 1
 
-        # if srt and running are different, print the running process and replace them
-        elif srt and running:
-            print(f'{running.label}({time})', end=' --> ')
-            running.execTime = 0
-            running = srt
-            running.execTime += 1
+    # if srt and running are different, print the running process and replace them
+    elif srt and running:
+      print(f'{running.label}({time})', end=' --> ')
+      running.execTime = 0
+      running = srt
+      running.execTime += 1
 
-        # when nothing is running, set srt as running
-        elif srt:
-            running = srt
-            running.execTime += 1
+    # when nothing is running, set srt as running
+    elif srt:
+      running = srt
+      running.execTime += 1
 
-        # each time loop starts, decrease remaining time of running by 1
-        if running:
-            running.run()
-        # increase time by 1
-        time += 1
+    # each time loop starts, decrease remaining time of running by 1
+    if running:
+      running.run()
+    # increase time by 1
+    time += 1
 
-        # when running is finished,
-        # set the exitTime to the time
-        # and remove it from ready queue
-        if running and running.isFinished():
-            running.exitTime = time
-            readyQueue.remove(running)
-            # calculate sum of turnaround time and sum of waiting time
-            sumTT += running.turnAroundTime()
-            sumWT += running.waitingTime()
-    # print the running process
-    print(f'{running.label}({time})')
-    # calculate average of turnaround time and average of waiting time
-    avgTT = sumTT / len(processes)
-    avgWT = sumWT / len(processes)
-    # print averages
-    print(" ______________________________________________________")
-    print()
-    print(f'\t Average Turnaround Time:\t{avgTT}\t')
-    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
-    print(" ______________________________________________________")
-    print()
-    print()
+    # when running is finished,
+    # set the exitTime to the time
+    # and remove it from ready queue
+    if running and running.isFinished():
+      running.exitTime = time
+      readyQueue.remove(running)
+      # calculate sum of turnaround time and sum of waiting time
+      sumTT += running.turnAroundTime()
+      sumWT += running.waitingTime()
+  # print the running process
+  print(f'{running.label}({time})')
+  # calculate average of turnaround time and average of waiting time
+  avgTT = sumTT / len(processes)
+  avgWT = sumWT / len(processes)
+  # print averages
+  print(" ______________________________________________________")
+  print()
+  print(f'\t Average Turnaround Time:\t{avgTT}\t')
+  print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+  print(" ______________________________________________________")
+  print()
+  print()
 
 
 def hrrn():
-    #=======================================#
-    #==    Highest Response Ratio Next    ==#
-    #=======================================#
+  #=======================================#
+  #==    Highest Response Ratio Next    ==#
+  #=======================================#
 
-    print('||=====================================================||')
-    print('||                                                     ||')
-    print('||             Highest Response Ratio Next             ||')
-    print('||                                                     ||')
-    print('||=====================================================||')
-    print()
+  print('||=====================================================||')
+  print('||                                                     ||')
+  print('||             Highest Response Ratio Next             ||')
+  print('||                                                     ||')
+  print('||=====================================================||')
+  print()
 
-    running = None
-    # 'runing' is the process that is running at the time
-    global processes
-    # create a copy of all processes
-    processesCopy = list(map(lambda x: x.copy(), processes))
-    # set an empty ready queue
-    readyQueue = []
-    # set time
-    time = 0
-    # set sum of turnaround time
-    sumTT = 0
-    # set sum of waiting time
-    sumWT = 0
+  running = None
+  # 'runing' is the process that is running at the time
+  global processes
+  # create a copy of all processes
+  processesCopy = list(map(lambda x: x.copy(), processes))
+  # set an empty ready queue
+  readyQueue = []
+  # set time
+  time = 0
+  # set sum of turnaround time
+  sumTT = 0
+  # set sum of waiting time
+  sumWT = 0
 
-    while len(processesCopy) != 0 or len(readyQueue) != 0:
-        for process in processesCopy:
-            if process.arrivalTime <= time:
-                readyQueue.append(process)
-            elif process.arrivalTime > time:
-                break
-            for process in readyQueue:
-                if process in processesCopy:
-                    processesCopy.remove(process)
+  while len(processesCopy) != 0 or len(readyQueue) != 0:
+    for process in processesCopy:
+      if process.arrivalTime <= time:
+        readyQueue.append(process)
+      elif process.arrivalTime > time:
+        break
+      for process in readyQueue:
+        if process in processesCopy:
+          processesCopy.remove(process)
 
-        hrr = None
-        for process in readyQueue:
+    hrr = None
+    for process in readyQueue:
 
-            if not hrr or hrr.responseRatio(time) < process.responseRatio(time):
-                hrr = process
+      if not hrr or hrr.responseRatio(time) < process.responseRatio(time):
+        hrr = process
 
-        hrr.execTime += hrr.burstTime
-        hrr.remainingTime = 0
-        time += hrr.burstTime
-        hrr.exitTime = time
-        print(f'{hrr.label}({time})', end=' --> ')
-        readyQueue.remove(hrr)
-        sumTT += hrr.turnAroundTime()
-        sumWT += hrr.waitingTime()
+    hrr.execTime += hrr.burstTime
+    hrr.remainingTime = 0
+    time += hrr.burstTime
+    hrr.exitTime = time
+    print(f'{hrr.label}({time})', end=' --> ')
+    readyQueue.remove(hrr)
+    sumTT += hrr.turnAroundTime()
+    sumWT += hrr.waitingTime()
 
-    # calculate average of turnaround time and average of waiting time
-    avgTT = sumTT / len(processes)
-    avgWT = sumWT / len(processes)
-    # print averages
-    print()
-    print(" ______________________________________________________")
-    print()
-    print(f'\t Average Turnaround Time:\t{avgTT}\t')
-    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
-    print(" ______________________________________________________")
-    print()
-    print()
+  # calculate average of turnaround time and average of waiting time
+  avgTT = sumTT / len(processes)
+  avgWT = sumWT / len(processes)
+  # print averages
+  print()
+  print(" ______________________________________________________")
+  print()
+  print(f'\t Average Turnaround Time:\t{avgTT}\t')
+  print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+  print(" ______________________________________________________")
+  print()
+  print()
 
 
 def rr():
-    #=======================================#
-    #==            Round Robin            ==#
-    #=======================================#
+  #=======================================#
+  #==            Round Robin            ==#
+  #=======================================#
 
-    print('||=====================================================||')
-    print('||                                                     ||')
-    print('||                     Round Robin                     ||')
-    print('||                                                     ||')
-    print('||=====================================================||')
-    print()
+  print('||=====================================================||')
+  print('||                                                     ||')
+  print('||                     Round Robin                     ||')
+  print('||                                                     ||')
+  print('||=====================================================||')
+  print()
 
-    running = None
-    global q1
-    global processes
-    # create a copy of all processes
-    processesCopy = list(map(lambda x: x.copy(), processes))
-    # set an empty ready queue
-    readyQueue = []
-    # set time
-    time = 0
-    # set sum of turnaround time
-    sumTT = 0
-    # set sum of waiting time
-    sumWT = 0
+  running = None
+  global q1
+  global processes
+  # create a copy of all processes
+  processesCopy = list(map(lambda x: x.copy(), processes))
+  # set an empty ready queue
+  readyQueue = []
+  # set time
+  time = 0
+  # set sum of turnaround time
+  sumTT = 0
+  # set sum of waiting time
+  sumWT = 0
 
-    while len(processesCopy) != 0 or len(readyQueue) != 0 or (running and not running.isFinished()):
-        # for all the processes:
-        for process in processesCopy:
-            if process.arrivalTime <= time:
-                readyQueue.append(process)
-            elif process.arrivalTime > time:
-                break
-        if running and not running.isFinished():
-            readyQueue.append(running)
-        for process in readyQueue:
-            if process in processesCopy:
-                processesCopy.remove(process)
+  while len(processesCopy) != 0 or len(readyQueue) != 0 or (
+      running and not running.isFinished()):
+    # for all the processes:
+    for process in processesCopy:
+      if process.arrivalTime <= time:
+        readyQueue.append(process)
+      elif process.arrivalTime > time:
+        break
+    if running and not running.isFinished():
+      readyQueue.append(running)
+    for process in readyQueue:
+      if process in processesCopy:
+        processesCopy.remove(process)
 
-        running = readyQueue.pop(0)
+    running = readyQueue.pop(0)
 
-        if running.remainingTime <= q1:
-            time += running.remainingTime
-            running.remainingTime = 0
-            running.exitTime = time
-            running.execTime += running.remainingTime
-            print(f'{running.label}({time})', end=' --> ')
-            running.execTime = 0
+    if running.remainingTime <= q1:
+      time += running.remainingTime
+      running.remainingTime = 0
+      running.exitTime = time
+      running.execTime += running.remainingTime
+      print(f'{running.label}({time})', end=' --> ')
+      running.execTime = 0
 
-        elif running.remainingTime > q1:
-            running.remainingTime -= q1
-            running.execTime += q1
-            time += q1
-            print(f'{running.label}({time})', end=' --> ')
-            running.execTime = 0
+    elif running.remainingTime > q1:
+      running.remainingTime -= q1
+      running.execTime += q1
+      time += q1
+      print(f'{running.label}({time})', end=' --> ')
+      running.execTime = 0
 
-        # calculate sum of turnaround time and sum of waiting time
-        if running.isFinished():
-            sumTT += running.turnAroundTime()
-            sumWT += running.waitingTime()
-    print()
-    # calculate average of turnaround time and average of waiting time
-    avgTT = sumTT / len(processes)
-    avgWT = sumWT / len(processes)
-    # print averages
-    print(" ______________________________________________________")
-    print()
-    print(f'\t Average Turnaround Time:\t{avgTT}\t')
-    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
-    print(" ______________________________________________________")
-    print()
-    print()
+    # calculate sum of turnaround time and sum of waiting time
+    if running.isFinished():
+      sumTT += running.turnAroundTime()
+      sumWT += running.waitingTime()
+  print()
+  # calculate average of turnaround time and average of waiting time
+  avgTT = sumTT / len(processes)
+  avgWT = sumWT / len(processes)
+  # print averages
+  print(" ______________________________________________________")
+  print()
+  print(f'\t Average Turnaround Time:\t{avgTT}\t')
+  print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+  print(" ______________________________________________________")
+  print()
+  print()
 
 
 def mfq():
-    #=======================================#
-    #==     Multilevel Feedback Queue     ==#
-    #==                                   ==#
-    #== Queue1 & Queue2: RR, Queue3: FCFS ==#
-    #=======================================#
+  #=======================================#
+  #==     Multilevel Feedback Queue     ==#
+  #==                                   ==#
+  #== Queue1 & Queue2: RR, Queue3: FCFS ==#
+  #=======================================#
 
-    print('||=====================================================||')
-    print('||                                                     ||')
-    print('||              Multilevel Feedback Queue              ||')
-    print('||                                                     ||')
-    print('||=====================================================||')
-    print()
+  print('||=====================================================||')
+  print('||                                                     ||')
+  print('||              Multilevel Feedback Queue              ||')
+  print('||                                                     ||')
+  print('||=====================================================||')
+  print()
 
-    running = None
-    global q1
-    global q2
-    global processes
-    # create a copy of all processes
-    processesCopy = list(map(lambda x: x.copy(), processes))
-    # set empty ready queueس
-    queue1 = []
-    queue2 = []
-    queue3 = []
-    # set time
-    time = 0
-    # set sum of turnaround time
-    sumTT = 0
-    # set sum of waiting time
-    sumWT = 0
+  running = None
+  global q1
+  global q2
+  global processes
+  # create a copy of all processes
+  processesCopy = list(map(lambda x: x.copy(), processes))
+  # set empty ready queueس
+  queue1 = []
+  queue2 = []
+  queue3 = []
+  # set time
+  time = 0
+  # set sum of turnaround time
+  sumTT = 0
+  # set sum of waiting time
+  sumWT = 0
 
-    while len(processesCopy) != 0 or len(queue1) != 0 or len(queue2) != 0 or len(queue3) != 0:
-        for process in processesCopy:
-            if process.arrivalTime <= time:
-                queue1.append(process)
-            elif process.arrivalTime > time:
-                break
-        for process in queue1:
-            if process in processesCopy:
-                processesCopy.remove(process)
+  while len(processesCopy) != 0 or len(queue1) != 0 or len(queue2) != 0 or len(
+      queue3) != 0:
+    for process in processesCopy:
+      if process.arrivalTime <= time:
+        queue1.append(process)
+      elif process.arrivalTime > time:
+        break
+    for process in queue1:
+      if process in processesCopy:
+        processesCopy.remove(process)
 
-        if len(queue1) != 0:
-            running = queue1.pop(0)
-            if running.remainingTime <= q1:
-                time += running.remainingTime
-                running.remainingTime = 0
-                running.exitTime = time
-                running.execTime += running.remainingTime
-                print(f'{running.label}({time})', end=' --> ')
-                running.execTime = 0
+    if len(queue1) != 0:
+      running = queue1.pop(0)
+      if running.remainingTime <= q1:
+        time += running.remainingTime
+        running.remainingTime = 0
+        running.exitTime = time
+        running.execTime += running.remainingTime
+        print(f'{running.label}({time})', end=' --> ')
+        running.execTime = 0
 
-            elif running.remainingTime > q1:
-                running.remainingTime -= q1
-                running.execTime += q1
-                time += q1
-                print(f'{running.label}({time})', end=' --> ')
-                running.execTime = 0
+      elif running.remainingTime > q1:
+        running.remainingTime -= q1
+        running.execTime += q1
+        time += q1
+        print(f'{running.label}({time})', end=' --> ')
+        running.execTime = 0
 
-            if running and not running.isFinished():
-                queue2.append(running)
+      if running and not running.isFinished():
+        queue2.append(running)
 
-        elif len(queue2) != 0:
-            running = queue2.pop(0)
+    elif len(queue2) != 0:
+      running = queue2.pop(0)
 
-            if running.remainingTime <= q2:
-                time += running.remainingTime
-                running.remainingTime = 0
-                running.exitTime = time
-                running.execTime += running.remainingTime
-                print(f'{running.label}({time})', end=' --> ')
-                running.execTime = 0
+      if running.remainingTime <= q2:
+        time += running.remainingTime
+        running.remainingTime = 0
+        running.exitTime = time
+        running.execTime += running.remainingTime
+        print(f'{running.label}({time})', end=' --> ')
+        running.execTime = 0
 
-            elif running.remainingTime > q2:
-                running.remainingTime -= q2
-                running.execTime += q2
-                time += q2
-                print(f'{running.label}({time})', end=' --> ')
-                running.execTime = 0
+      elif running.remainingTime > q2:
+        running.remainingTime -= q2
+        running.execTime += q2
+        time += q2
+        print(f'{running.label}({time})', end=' --> ')
+        running.execTime = 0
 
-            if running and not running.isFinished():
-                queue3.append(running)
+      if running and not running.isFinished():
+        queue3.append(running)
 
-        elif len(queue3) != 0:
-            running = queue3.pop(0)
-            running.execTime += running.remainingTime
-            print(f'{running.label}({time})', end=' --> ')
-            time += running.remainingTime
-            running.exitTime = time
-            running.remainingTime = 0
+    elif len(queue3) != 0:
+      running = queue3.pop(0)
+      running.execTime += running.remainingTime
+      print(f'{running.label}({time})', end=' --> ')
+      time += running.remainingTime
+      running.exitTime = time
+      running.remainingTime = 0
 
-    # calculate sum of turnaround time and sum of waiting time
-        if running.isFinished():
-            sumTT += running.turnAroundTime()
-            sumWT += running.waitingTime()
-    print()
-    # calculate average of turnaround time and average of waiting time
-    avgTT = sumTT / len(processes)
-    avgWT = sumWT / len(processes)
-    # print averages
-    print()
-    print(" ______________________________________________________")
-    print()
-    print(f'\t Average Turnaround Time:\t{avgTT}\t')
-    print(f'\t Average   Waiting  Time:\t{avgWT}\t')
-    print("_______________________________________________________")
-    print()
-    print()
+  # calculate sum of turnaround time and sum of waiting time
+    if running.isFinished():
+      sumTT += running.turnAroundTime()
+      sumWT += running.waitingTime()
+  print()
+  # calculate average of turnaround time and average of waiting time
+  avgTT = sumTT / len(processes)
+  avgWT = sumWT / len(processes)
+  # print averages
+  print()
+  print(" ______________________________________________________")
+  print()
+  print(f'\t Average Turnaround Time:\t{avgTT}\t')
+  print(f'\t Average   Waiting  Time:\t{avgWT}\t')
+  print("_______________________________________________________")
+  print()
+  print()
 
 
 #===========================================#
